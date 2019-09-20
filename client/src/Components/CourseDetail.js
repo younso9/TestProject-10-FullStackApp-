@@ -11,8 +11,8 @@ class CourseDetail extends Component {
             estimatedTime: null,
             materialsNeeded: null,
             user: {
-            firstName: null,
-            lastName: null
+                firstName: null,
+                lastName: null
             }
         }
     }
@@ -53,7 +53,7 @@ class CourseDetail extends Component {
     }
 
     deleteCourse() {
-        fetch(`http://localhost:5500/api/courses/${this.props.id}`, {
+        fetch(`http://localhost:5000/api/courses/${this.props.id}`, {
             method: "DELETE",
             headers: this.props.user.headers
         }).then(res => {

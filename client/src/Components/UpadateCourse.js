@@ -1,142 +1,172 @@
 import React, { Component } from 'react';
+import CourseForm from './CourseForm';
+import { Redirect } from 'react-router-dom';
 
-class UpdateCourse extends Component {
+export default class UpdateCourse extends Component {
+    constructor() {
+        super();
 
-    state = {
-        course: {
-            title: null,
+        this.state = {
+            title: '',
             description: '',
-            estimatedTime: null,
             materialsNeeded: '',
-            user: {
-                firstName: null,
-                lastName: null,
-                id: null
-            }
-        },
-        messages: null
+            estimatedTime: '',
+            id: null,
+            courseUserId: null,
+            errors: []
+        };
     }
 
-    handleDescChange(e) {
-        this.setState({
-            course: { ...this.state.course, description: e.target.value }
-        })
-    }
+    fetchCourseById = (courseId) => {
+        //when loading the page, empty the state variables
+        //so the render will show default state while the courses load
+        this.setState({ title: '', description: '', materialsNeeded: '', estimatedTime: '', isLoading: true, id: null, courseUserId: null, courseWasFound: false });
 
-    handleMatsChange(e) {
-        this.setState({
-            course: { ...this.state.course, materialsNeeded: e.target.value }
-        })
-    }
+        const { context } = this.props;
 
-    componentDidMount() {
-        fetch(`http://localhost:5000/api/courses/${this.props.id}`)
-            .then(res => {
-                res.json()
-                    .then(course => {
-                        if (res.status === 200) {
-                            this.setState({ course });
-                        }
-                    })
-            })
-    }
-    componentDidUpdate() {
-        if (this.state.course.user._id !== null && this.props.user) {
-            if (this.state.course.user._id !== this.props.user.id) {
-                this.props.history.push('/forbidden');
-            }
-        }
-    }
-
-    updateCourse(e) {
-        e.preventDefault();
-        this.setState({ messages: null });
-        const data = JSON.stringify({
-            title: e.target[0].value,
-            description: e.target[1].value,
-            estimatedTime: e.target[2].value,
-            materialsNeeded: e.target[3].value
-        });
-        fetch(`http://localhost:5000/api/courses/${this.props.id}`, {
-            method: "PUT",
-            body: data,
-            headers: this.props.user.headers
-        }
-        )
-            .then(res => {
-                if (res.status !== 204) {
-                    res.json()
-                        .then(res => {
-                            let messages = res.message.split(","); //split the errors
-                            messages = messages.map(message => message.split(":")); //split titles from errors
-                            messages = messages.map(message => message.pop()); //take only the error
-                            this.setState({ messages });
-                        });
-                } else {
-                    //redirect
-                    this.props.history.push('/');
+        context.data.getCourseById(courseId)
+            .then(responseData => {
+                if (responseData.id) {
+                    this.setState({ title: responseData.title, description: responseData.description, materialsNeeded: responseData.materialsNeeded, estimatedTime: responseData.estimatedTime, isLoading: false, id: responseData.id, courseUserId: responseData.user.id, courseWasFound: true });
                 }
+                else {
+                    this.setState({ title: '', description: '', materialsNeeded: '', estimatedTime: '', isLoading: false, id: -1, courseUserId: -1, courseWasFound: false });
+                }
+            })
+            .catch(error => {
+                console.log('Error fetching and parsing data', error);
             });
     }
 
-    printErrors() {
-        if (this.state.messages !== null) {
-            const messages = this.state.messages.map((message, i) => <li key={i}>{message}</li>)
-            return (
-                <div>
-                    <h2 className="validation--errors--label">Validation errors</h2>
-                    <div className="validation-errors">
-                        <ul>
-                            {messages}
-                        </ul>
-                    </div>
-                </div>
-            );
-        }
+    componentDidMount() {
+        this.fetchCourseById(this.props.match.params.id);
     }
 
     render() {
+        const { context } = this.props;
+        const authUser = context.authenticatedUser;
+        //if state.id was not null, and courseWasFound is false, redirect to /notfound
+        //if state.id was not null, and courseWasFound is true, and the auth user's ID
+        //is not the same as the state.courseUserId, redirect the user to /forbidden
+        if (this.state.id) {
+            if (!this.state.courseWasFound) {
+                return <Redirect to='/notfound' />
+            }
+            if (context.authenticatedUser.id !== this.state.courseUserId) {
+                return <Redirect to='/forbidden' />
+            }
+        }
         return (
-            <div className="bounds course--detail">
+
+            <div className="bounds">
                 <h1>Update Course</h1>
-                <div>
-                    {this.printErrors()}
-                    <form onSubmit={(e) => this.updateCourse(e)}>
-                        <div className="grid-66">
-                            <div className="course--header">
-                                <h4 className="course--label">Course</h4>
-                                <div><input id="title" name="title" type="text" className="input-title course--title--input" placeholder="Course title..."
-                                    defaultValue={this.state.course.title} /></div>
-                                <p>By {this.state.course.user.firstName} {this.state.course.user.lastName}</p>
-                            </div>
-                            <div className="course--description">
-                                <div><textarea id="description" name="description" className="" placeholder="Course description..." onChange={(e) => this.handleDescChange(e)} value={this.state.course.description} /></div>
-                            </div>
-                        </div>
-                        <div className="grid-25 grid-right">
-                            <div className="course--stats">
-                                <ul className="course--stats--list">
-                                    <li className="course--stats--list--item">
-                                        <h4>Estimated Time</h4>
-                                        <div><input id="estimatedTime" name="estimatedTime" type="text" className="course--time--input"
-                                            placeholder="Hours" defaultValue={this.state.course.estimatedTime} /></div>
-                                    </li>
-                                    <li className="course--stats--list--item">
-                                        <h4>Materials Needed</h4>
-                                        <div><textarea id="materialsNeeded" name="materialsNeeded" className="" placeholder="List materials..." onChange={(e) => this.handleMatsChange(e)} value={this.state.course.materialsNeeded} /></div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="grid-100 pad-bottom">
-                            <button className="button" type="submit">Update Course</button>
-                            <button className="button button-secondary" onClick={(e) => { e.preventDefault(); this.props.history.push(`/courses/${this.props.id}`); }}>Cancel</button>
-                        </div>
-                    </form>
-                </div>
+                {/** use CourseForm component, adding in the elements linked to the state variables
+                react to changes in the input elements calling this.change to update stored
+                state value as the user types (similar to Project 7)
+           **/}
+                <CourseForm
+                    cancel={this.cancel}
+                    errors={this.state.errors}
+                    submit={this.submit}
+                    submitButtonText="Update Course"
+                    userName={authUser.firstName + " " + authUser.lastName}
+                    titleElement={() => (
+                        <React.Fragment>
+                            <input
+                                id="title"
+                                name="title"
+                                type="text"
+                                value={this.state.title}
+                                onChange={this.change}
+                                className="input-title course--title--input"
+                                placeholder="Course title..." />
+                        </React.Fragment>
+                    )}
+                    descriptionElement={() => (
+                        <React.Fragment>
+                            <textarea
+                                id="description"
+                                name="description"
+                                type="description"
+                                value={this.state.description}
+                                onChange={this.change}
+                                placeholder="Course description..." />
+                        </React.Fragment>
+                    )}
+                    estimatedTimeElement={() => (
+                        <React.Fragment>
+                            <input
+                                id="estimatedTime"
+                                name="estimatedTime"
+                                type="text"
+                                value={this.state.estimatedTime}
+                                onChange={this.change}
+                                className="course--time--input"
+                                placeholder="Hours" />
+                        </React.Fragment>
+                    )}
+                    materialsNeededElement={() => (
+                        <React.Fragment>
+                            <textarea
+                                id="materialsNeeded"
+                                name="materialsNeeded"
+                                type="materialsNeeded"
+                                value={this.state.materialsNeeded}
+                                onChange={this.change}
+                                placeholder="List materials..." />
+                        </React.Fragment>
+                    )} />
             </div>
         );
     }
-}
 
-export default UpdateCourse;
+    change = (e) => {
+        const name = e.target.name;
+        const value = e.target.value;
+
+        this.setState(() => {
+            return {
+                [name]: value
+            };
+        });
+    }
+
+    submit = () => {
+        const { context } = this.props;
+
+        const title = this.state.title;
+        const description = this.state.description;
+        const estimatedTime = this.state.estimatedTime;
+        const materialsNeeded = this.state.materialsNeeded;
+        const id = this.state.id;
+
+        // Create course
+        const course = {
+            title,
+            description,
+            estimatedTime,
+            materialsNeeded,
+        };
+
+        context.data.updateCourse(course, id, context.authenticatedUser, context.authenticatedUserPwd)
+            .then(courseUpdateResult => {
+                if (!courseUpdateResult.length) {
+                    this.props.history.push('/courses/' + id);
+
+                } else {
+                    this.setState(() => {
+                        return { errors: courseUpdateResult };
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.props.history.push('/error');
+            });
+
+    }
+
+    cancel = () => {
+        this.props.history.push('/courses/' + this.props.match.params.id);
+    }
+}

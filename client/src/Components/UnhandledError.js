@@ -1,14 +1,12 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
 
+//UnhandledError component - exception reached (500)
 const UnhandledError = () => {
     return (
-        <div className="bounds">
-            <h1>Error</h1>
-            <p>Unexpected Error Has Occurred.</p>
-            <Link className="button button-secondary" to="/"> Back To List
-            </Link>
+        <div className="item-not-found">
+            Ayudame! You just found a 404!
         </div>
-    );
+    )
 }
+
 export default UnhandledError;

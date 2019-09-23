@@ -1,40 +1,21 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import UserForm from './UserForm';
 
+//component which renders a form to allow the user to establish a new user in the application
 
-//TODO add validation error messages
-class UserSignUp extends Component {
-    state = {
-        message: null
-    }
+export default class UserSignUp extends Component {
+    constructor() {
+        super();
 
-    async submitForm(e) {
-        e.preventDefault();
-        if (e.target[3].value === e.target[4].value) {
-            let error = await this.props.signUp(e.target[0].value, e.target[1].value, e.target[2].value, e.target[3].value)
-            if (!error) {//undifined when no errors
-                this.props.history.push('/');
-            } else {
-                this.setState({ message: error.message });
-            }
-        } else {
-            this.setState({ message: "Please ensure your passwords match" })
-        }
-        //set messages
-    }
-
-    printErrors() {
-        if (this.state.messages !== null) {
-            return (
-                <div>
-                    <div className="validation-errors">
-                        <ul>
-                            {this.state.message}
-                        </ul>
-                    </div>
-                </div>
-            );
-        }
+        this.state = {
+            firstName: '',
+            lastName: '',
+            emailAddress: '',
+            password: '',
+            confirmPassword: '',
+            errors: []
+        };
     }
 
     render() {
@@ -42,27 +23,137 @@ class UserSignUp extends Component {
             <div className="bounds">
                 <div className="grid-33 centered signin">
                     <h1>Sign Up</h1>
-                    <div>
-                        {this.printErrors()}
-                        <form onSubmit={(e) => { this.submitForm(e) }}>
-                            <div><input id="firstName" name="firstName" type="text" className="" placeholder="First Name" defaultValue="" /></div>
-                            <div><input id="lastName" name="lastName" type="text" className="" placeholder="Last Name" defaultValue="" /></div>
-                            <div><input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" defaultValue="" /></div>
-                            <div><input id="password" name="password" type="password" className="" placeholder="Password" defaultValue="" /></div>
-                            <div><input id="confirmPassword" name="confirmPassword" type="password" className="" placeholder="Confirm Password"
-                                defaultValue="" /></div>
-                            <div className="grid-100 pad-bottom">
-                                <button className="button" type="submit">Sign Up</button>
-                                <button className="button button-secondary" onClick={(e) => { e.preventDefault(); this.props.history.push('/'); }}>Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                    <p>&nbsp;</p>
-                    <p>Already have a user account? <NavLink to="/signin">Click here</NavLink> to sign in!</p>
+                    <UserForm
+                        cancel={this.cancel}
+                        errors={this.state.errors}
+                        submit={this.submit}
+                        submitButtonText="Sign Up"
+                        elements={() => (
+                            <React.Fragment>
+                                <input
+                                    id="firstName"
+                                    name="firstName"
+                                    type="text"
+                                    value={this.state.firstName}
+                                    onChange={this.change}
+                                    placeholder="First Name" />
+                                <input
+                                    id="lastName"
+                                    name="lastName"
+                                    type="text"
+                                    value={this.state.lastName}
+                                    onChange={this.change}
+                                    placeholder="Last Name" />
+                                <input
+                                    id="emailAddress"
+                                    name="emailAddress"
+                                    type="text"
+                                    value={this.state.emailAddress}
+                                    onChange={this.change}
+                                    placeholder="Email Address" />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    value={this.state.password}
+                                    onChange={this.change}
+                                    placeholder="Password" />
+                                <input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    value={this.state.confirmPassword}
+                                    onChange={this.change}
+                                    placeholder="Confirm Password" />
+                            </React.Fragment>
+                        )} />
+                    <p>
+                        Already have a user account? <Link to="/signin">Click here</Link> to sign in!
+          </p>
                 </div>
             </div>
         );
     }
-}
 
-export default UserSignUp
+    change = (e) => {
+        const name = e.target.name;
+        const value = e.target.value;
+
+        this.setState(() => {
+            return {
+                [name]: value
+            };
+        });
+    }
+
+    submit = () => {
+        const { context } = this.props;
+
+        let errorList = [];
+
+        const firstName = this.state.firstName;
+        const lastName = this.state.lastName;
+        const emailAddress = this.state.emailAddress;
+        const password = this.state.password;
+        const confirmPassword = this.state.confirmPassword;
+
+        //input validators
+        if (firstName === '') {
+            errorList.push('First Name must be provided.');
+        }
+        if (lastName === '') {
+            errorList.push('Last Name must be provided.');
+        }
+        if (emailAddress === '') {
+            errorList.push('Email Address must be provided.');
+        }
+        if (password === '') {
+            errorList.push('Password must be provided.');
+        }
+        else if (confirmPassword === '') {
+            errorList.push('Confirm Password must be provided.');
+        }
+        else if (password !== confirmPassword) {
+            errorList.push('Password and Confirm Password do not match.');
+        }
+
+        if (errorList.length > 0) {
+            this.setState(() => {
+                return { errors: errorList };
+            });
+        }
+
+
+        else {
+            // Create user
+            const user = {
+                firstName,
+                lastName,
+                emailAddress,
+                password,
+            };
+
+            context.data.createUser(user)
+                .then(errors => {
+                    if (errors.length) {
+                        this.setState(() => {
+                            return { errors: [errors] };
+                        });
+                    } else {
+                        context.actions.signIn(emailAddress, password)
+                            .then(() => {
+                                this.props.history.push('/');
+                            });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.props.history.push('/error');
+                });
+        }
+    }
+
+    cancel = () => {
+        this.props.history.push('/');
+    }
+}

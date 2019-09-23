@@ -1,30 +1,45 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-const Header = ({ user }) => {
-    const checkUser = () => {
-        if (user) {
-            return (
-                <nav><span>Welcome {user.firstName} {user.lastName}!</span><NavLink className="signout" to="/signout">Sign Out</NavLink></nav>
-            );
-        } else {
-            return (
-                <nav><NavLink className="signup" to="/signup">Sign Up</NavLink><NavLink className="signin" to="/signin">Sign In</NavLink></nav>
-            );
-        }
-    }
+//withRouter gives the Header access to the 'this.props.location' attribute, allowing pathname
+//to be set to a variable and passed to the SignIn and SignUp Link clicks (UserSignIn and UserSignUp components)
+import { withRouter } from 'react-router';
 
-    return (
-        //signed in
+class Header extends React.PureComponent {
+    render() {
+        const { context } = this.props;
+        const authUser = context.authenticatedUser;
 
-        <div className="header">
-            <div className="bounds">
-                <NavLink to="/"><h1 className="header--logo">Courses</h1></NavLink>
-                {checkUser()}
+        const pathway = this.props.location.pathname;
+
+        return (
+            <div className="header">
+                <div className="bounds">
+                    <h1 className="header--logo">Courses</h1>
+                    <nav>
+                        {/* inline conditional: if authUser is not null, user is logged in. If not, offer sign up and sign in links */}
+                        {authUser ? (
+                            <React.Fragment>
+                                <span>Welcome, {authUser.firstName + " " + authUser.lastName}!</span>
+                                <Link to="/signout">Sign Out</Link>
+                            </React.Fragment>
+                        ) : (
+                                <React.Fragment>
+                                    <Link className="signup" to={{
+                                        pathname: '/signup',
+                                        state: { from: pathway }
+                                    }} >Sign Up</Link>
+                                    <Link className="signin" to={{
+                                        pathname: '/signin',
+                                        state: { from: pathway }
+                                    }} >Sign In</Link>
+                                </React.Fragment>
+                            )}
+                    </nav>
+                </div>
             </div>
-            <hr />
-        </div>
-    );
-}
+        );
+    }
+};
 
-export default Header;
+export default withRouter(Header);

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-const UserSignOut = ({ signOut }) => {
-    signOut();
+
+export default ({ context }) => {
+    //execute signout action, go to list
+    context.actions.signOut();
+
     return (
         <Redirect to="/" />
     );
 }
-
-export default UserSignOut;

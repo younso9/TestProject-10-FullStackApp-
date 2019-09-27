@@ -14,11 +14,10 @@ export class Provider extends Component {
         this.data = new Data();
     }
 
-    render() {
-        //retrieve authentication tokens from the variable
+    render() { // This will retrieve the authentication tokens from the variable
         const { authenticatedUser, authenticatedUserPwd } = this.state;
 
-        //define variables and methods accessible in this Provider component
+        //  This defines the variables and methods accessible in the provider component
         const value = {
             authenticatedUser,
             authenticatedUserPwd,
@@ -28,15 +27,15 @@ export class Provider extends Component {
                 signOut: this.signOut
             },
         };
-        return (
-            //using layout JSX
+        return ( // using layout JSX
+            
             <Context.Provider value={value}>
                 {this.props.children}
             </Context.Provider>
         );
     }
 
-    //called by UserSignIn component to authentcate user
+    // This is called by UserSignIn component to authentcate user
     signIn = async (username, password) => {
         const user = await this.data.getUser(username, password);
         if (user !== null) {
@@ -46,7 +45,6 @@ export class Provider extends Component {
                     authenticatedUserPwd: password,
                 };
             });
-
 
             const cookieOptions = {
                 expires: 1
@@ -59,7 +57,7 @@ export class Provider extends Component {
         return user;
     }
 
-    //called by UserSignOut component - set tokens to null, delete the cookie
+    // This is called by UserSignOut component to set tokens to null and delete cookies
     signOut = () => {
         this.setState({ authenticatedUser: null, authenticatedUserPwd: null });
         Cookies.remove('authenticatedUser');
@@ -67,14 +65,11 @@ export class Provider extends Component {
     }
 }
 
-
 export const Consumer = Context.Consumer;
 
 /**
- * A higher-order component that wraps the provided component in a Context Consumer component.
- * @param {class} Component - A React component.
- * @returns {function} A higher-order component.
- */
+ * This component wraps the provider component in the Context Consumer component.
+ * @param {class} Component - A React component.@returns {function} */
 
 export default function withContext(Component) {
     return function ContextComponent(props) {

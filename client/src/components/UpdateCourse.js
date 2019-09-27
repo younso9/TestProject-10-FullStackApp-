@@ -18,26 +18,22 @@ export default class UpdateCourse extends Component {
   }
 
   fetchCourseById = (courseId) => {
-    //when loading the page, empty the state variables
-    //so the render will show default state while the courses load
     this.setState({ title: '', description: '', materialsNeeded: '', estimatedTime: '', isLoading: true, id: null, courseUserId: null, courseWasFound: false });
-    
+
     const { context } = this.props;
 
     context.data.getCourseById(courseId)
-    .then(responseData => {
-      if (responseData.id)
-      {
-        this.setState({ title: responseData.title, description: responseData.description, materialsNeeded: responseData.materialsNeeded, estimatedTime: responseData.estimatedTime, isLoading: false, id: responseData.id, courseUserId: responseData.user.id, courseWasFound: true });
-      }
-      else
-      {
-        this.setState({  title: '', description: '', materialsNeeded: '', estimatedTime: '', isLoading: false, id: -1, courseUserId: -1, courseWasFound: false });
-      }
-    })
-    .catch(error => {
-      console.log('Error fetching and parsing data', error);
-    });
+      .then(responseData => {
+        if (responseData.id) {
+          this.setState({ title: responseData.title, description: responseData.description, materialsNeeded: responseData.materialsNeeded, estimatedTime: responseData.estimatedTime, isLoading: false, id: responseData.id, courseUserId: responseData.user.id, courseWasFound: true });
+        }
+        else {
+          this.setState({ title: '', description: '', materialsNeeded: '', estimatedTime: '', isLoading: false, id: -1, courseUserId: -1, courseWasFound: false });
+        }
+      })
+      .catch(error => {
+        console.log('Error fetching and parsing data', error);
+      });
   }
 
   componentDidMount() {
@@ -47,11 +43,8 @@ export default class UpdateCourse extends Component {
   render() {
     const { context } = this.props;
     const authUser = context.authenticatedUser;
-    //if state.id was not null, and courseWasFound is false, redirect to /notfound
-    //if state.id was not null, and courseWasFound is true, and the auth user's ID
-      //is not the same as the state.courseUserId, redirect the user to /forbidden
-    if (this.state.id)
-    {
+
+    if (this.state.id) {
       if (!this.state.courseWasFound) {
         return <Redirect to='/notfound' />
       }
@@ -60,66 +53,66 @@ export default class UpdateCourse extends Component {
       }
     }
     return (
-      
+
       <div className="bounds">
-          <h1>Update Course</h1>
-          {/** use CourseForm component, adding in the elements linked to the state variables
+        <h1>Update Course</h1>
+        {/** use CourseForm component, adding in the elements linked to the state variables
                 react to changes in the input elements calling this.change to update stored
                 state value as the user types (similar to Project 7)
            **/}
-          <CourseForm 
-            cancel={this.cancel}
-            errors={this.state.errors}
-            submit={this.submit}
-            submitButtonText="Update Course"
-            userName={authUser.firstName + " " + authUser.lastName}
-            titleElement={() => (
-              <React.Fragment>
-                <input 
-                  id="title" 
-                  name="title" 
-                  type="text"
-                  value={this.state.title} 
-                  onChange={this.change} 
-                  className="input-title course--title--input"
-                  placeholder="Course title..." />
-              </React.Fragment>
-            )}
-            descriptionElement={() => (
-              <React.Fragment>
-                  <textarea 
-                  id="description" 
-                  name="description" 
-                  type="description"
-                  value={this.state.description} 
-                  onChange={this.change} 
-                  placeholder="Course description..." />
-                  </React.Fragment>
-            )}
-            estimatedTimeElement={() => (
-              <React.Fragment>
-                <input 
-                  id="estimatedTime" 
-                  name="estimatedTime" 
-                  type="text"
-                  value={this.state.estimatedTime} 
-                  onChange={this.change} 
-                  className="course--time--input"
-                  placeholder="Hours" />
-                  </React.Fragment>
-            )}
-            materialsNeededElement={() => (
-              <React.Fragment>
-                <textarea 
-                  id="materialsNeeded" 
-                  name="materialsNeeded"
-                  type="materialsNeeded"
-                  value={this.state.materialsNeeded} 
-                  onChange={this.change} 
-                  placeholder="List materials..." />
-              </React.Fragment>
-            )} />
-        </div>
+        <CourseForm
+          cancel={this.cancel}
+          errors={this.state.errors}
+          submit={this.submit}
+          submitButtonText="Update Course"
+          userName={authUser.firstName + " " + authUser.lastName}
+          titleElement={() => (
+            <React.Fragment>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                value={this.state.title}
+                onChange={this.change}
+                className="input-title course--title--input"
+                placeholder="Course title..." />
+            </React.Fragment>
+          )}
+          descriptionElement={() => (
+            <React.Fragment>
+              <textarea
+                id="description"
+                name="description"
+                type="description"
+                value={this.state.description}
+                onChange={this.change}
+                placeholder="Course description..." />
+            </React.Fragment>
+          )}
+          estimatedTimeElement={() => (
+            <React.Fragment>
+              <input
+                id="estimatedTime"
+                name="estimatedTime"
+                type="text"
+                value={this.state.estimatedTime}
+                onChange={this.change}
+                className="course--time--input"
+                placeholder="Hours" />
+            </React.Fragment>
+          )}
+          materialsNeededElement={() => (
+            <React.Fragment>
+              <textarea
+                id="materialsNeeded"
+                name="materialsNeeded"
+                type="materialsNeeded"
+                value={this.state.materialsNeeded}
+                onChange={this.change}
+                placeholder="List materials..." />
+            </React.Fragment>
+          )} />
+      </div>
     );
   }
 
@@ -152,7 +145,7 @@ export default class UpdateCourse extends Component {
     };
 
     context.data.updateCourse(course, id, context.authenticatedUser, context.authenticatedUserPwd)
-      .then( courseUpdateResult => {
+      .then(courseUpdateResult => {
         if (!courseUpdateResult.length) {
           this.props.history.push('/courses/' + id);
 
@@ -166,7 +159,7 @@ export default class UpdateCourse extends Component {
         console.log(err);
         this.props.history.push('/error');
       });
-  
+
   }
 
   cancel = () => {

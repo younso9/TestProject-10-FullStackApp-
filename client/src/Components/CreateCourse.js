@@ -91,7 +91,7 @@ export default class CreateCourse extends Component {
         });
     }
 
-    //submit method - use Data to send the request to the API to create the Course
+    //submit method  for  title,description ,estimatedTime,materialsNeeded.
     submit = () => {
         const { context } = this.props;
 
@@ -100,27 +100,25 @@ export default class CreateCourse extends Component {
         const estimatedTime = this.state.estimatedTime;
         const materialsNeeded = this.state.materialsNeeded;
 
-        // Create course
+
         const course = {
             title,
-            description,
+            description,   // Create course
             estimatedTime,
             materialsNeeded,
         };
 
         context.data.createCourse(course, context.authenticatedUser, context.authenticatedUserPwd)
             .then(courseCreateResult => {
-                if (!courseCreateResult.length) {
-                    //would be great to redirect user to the Location value in the HTTP header of the response, but:
-                    //https://stackoverflow.com/questions/43344819/reading-response-headers-with-fetch-api
-                    //Can't access Location header in CORS
-                    //go back to course list instead...
-                    this.props.history.push('/');
+                if (title === '' || description === '') {
+                    this.setState({
+                        errors: ["missing info "]
+                    });
+                    return;
+                    //this.props.history.push('/');
 
                 } else {
-                    this.setState(() => {
-                        return { errors: [courseCreateResult] };
-                    });
+                    this.props.history.push('/');
                 }
             })
             .catch((err) => {

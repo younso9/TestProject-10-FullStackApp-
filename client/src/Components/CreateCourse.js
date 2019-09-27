@@ -91,7 +91,7 @@ export default class CreateCourse extends Component {
         });
     }
 
-    //submit method  for  title,description ,estimatedTime,materialsNeeded.
+  
     submit = () => {
         const { context } = this.props;
 
@@ -100,10 +100,10 @@ export default class CreateCourse extends Component {
         const estimatedTime = this.state.estimatedTime;
         const materialsNeeded = this.state.materialsNeeded;
 
-
+    // Create course
         const course = {
             title,
-            description,   // Create course
+            description,   
             estimatedTime,
             materialsNeeded,
         };
@@ -112,7 +112,7 @@ export default class CreateCourse extends Component {
             .then(courseCreateResult => {
                 if (title === '' || description === '') {
                     this.setState({
-                        errors: ["missing info "]
+                        errors: ["Please provide required information"]
                     });
                     return;
                     //this.props.history.push('/');
@@ -125,7 +125,6 @@ export default class CreateCourse extends Component {
                 console.log(err);
                 this.props.history.push('/error');
             });
-
     }
 
     cancel = () => {

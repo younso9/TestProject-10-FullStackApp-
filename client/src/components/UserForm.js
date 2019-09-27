@@ -1,5 +1,7 @@
 import React from 'react';
-//Component used by the UserSignIn and UserSignUp 
+
+//This component is used by the UserSignIn and UserSignUp 
+
 export default (props) => {
     const {
         cancel,
@@ -33,7 +35,7 @@ export default (props) => {
     );
 }
 
-//if validation errors exist,  it ill show through this method
+// The validation errors are displayed through this method if they exist
 function ErrorsDisplay({ errors }) {
     let errorsDisplay = null;
 

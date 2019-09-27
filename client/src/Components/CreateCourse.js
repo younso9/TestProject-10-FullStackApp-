@@ -91,7 +91,7 @@ export default class CreateCourse extends Component {
         });
     }
 
-  
+    //  SUBMIT method  for  title, description, estimatedTime and materialsNeeded.
     submit = () => {
         const { context } = this.props;
 
@@ -115,8 +115,7 @@ export default class CreateCourse extends Component {
                         errors: ["Please provide required information"]
                     });
                     return;
-                    //this.props.history.push('/');
-
+              
                 } else {
                     this.props.history.push('/');
                 }

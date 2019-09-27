@@ -1,6 +1,6 @@
 import React from 'react';
 
-//Forbidden component - reached when access to a route was not permitted
+//Forbidden component is reached when access to a route is not permitted
 const Forbidden = () => {
   return (
     <div>

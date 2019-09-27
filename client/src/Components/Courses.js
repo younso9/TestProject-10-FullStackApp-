@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import Data from '../Data';
+
+//This defines the components and creates constructor defining its default state
 class Courses extends Component {
-  constructor() {
+  constructor() { // Default constructor
     super();
-    this.state = {
+    this.state = { //default state: courses empty array, isLoading boolean true
       courses: [],
       isLoading: true
     };
   }
 
-  fetchCourses = () => {
+  fetchCourses = () => {  // This empties the state variables when loading the page - render will show the default state 
     this.setState({ courses: [], isLoading: true });
 
     const data = new Data();
@@ -22,7 +24,7 @@ class Courses extends Component {
         console.log('Error fetching and parsing data', error);
       });
   }
-
+  // This constructs a link div for the course and is passed into map method of the array
   mapJsonToCourseLink = (course, i) => {
     return <div className="grid-33" key={i}><a className="course--module course--link" href={"/courses/" + course.id}>
       <h4 className="course--label">Course</h4>
@@ -30,29 +32,25 @@ class Courses extends Component {
     </a></div>;
   }
 
-
-
+  // Once the componentDidMount is called render will continously check if state.isLoading is true or false
   componentDidMount() {
     this.fetchCourses();
   }
 
-
   render() {
     let courseList = [];
 
-    if (this.state.courses.length > 0) {
+    if (this.state.courses.length > 0) { //This will display if the courses array has content 
       courseList = this.state.courses.map(this.mapJsonToCourseLink);
     }
 
-    else if (!this.state.isLoading) {
+    else if (!this.state.isLoading) {  // This will show Nothing Found message if there are no courseList in the array, 
       courseList = <li>No results found...</li>;
     }
 
-    else {
+    else {  // This will display the generic Loading panel
       courseList = <li>Loading...</li>;
     }
-
-
 
     return <div>
       <div className="bounds">

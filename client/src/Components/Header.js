@@ -1,3 +1,4 @@
+// This is the Stateless functional component 
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -17,7 +18,7 @@ class Header extends React.PureComponent {
                     <h1 className="header--logo">Courses</h1>
                     <nav>
 
-                        {authUser ? (
+                        {authUser ? (  // Ternary operator to render content representing the current state 
                             <React.Fragment>
                                 <span>Welcome, {authUser.firstName + " " + authUser.lastName}!</span>
                                 <Link to="/signout">Sign Out</Link>

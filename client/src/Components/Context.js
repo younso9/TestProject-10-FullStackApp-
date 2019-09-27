@@ -52,7 +52,6 @@ export class Provider extends Component {
 
             Cookies.set('authenticatedUser', JSON.stringify(user), cookieOptions);
             Cookies.set('authenticatedUserPwd', password, cookieOptions);
-
         }
         return user;
     }
@@ -67,8 +66,7 @@ export class Provider extends Component {
 
 export const Consumer = Context.Consumer;
 
-/**
- * This component wraps the provider component in the Context Consumer component.
+/*** This component wraps the provider component in the Context Consumer component.
  * @param {class} Component - A React component.@returns {function} */
 
 export default function withContext(Component) {

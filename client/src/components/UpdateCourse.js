@@ -43,7 +43,7 @@ export default class UpdateCourse extends Component {
   render() {
     const { context } = this.props;
     const authUser = context.authenticatedUser;
-
+    
     if (this.state.id) {
       if (!this.state.courseWasFound) {
         return <Redirect to='/notfound' />

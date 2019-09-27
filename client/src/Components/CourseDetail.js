@@ -5,12 +5,12 @@ import ReactMarkdown from "react-markdown";
 
 class CourseDetail extends Component {
   constructor() {
-    super(); //execute default constructor
+    super(); // This will execute the default constructor
 
-    this.state = {
-      course: null, //
-      isLoading: true, // courses empty array, isLoading boolean true, courseWasFound false, found ID null
-      courseWasFound: false, //
+    this.state = {  // courses empty array,
+      course: null, 
+      isLoading: true, // isLoading boolean true, 
+      courseWasFound: false, // courseWasFound false, found ID null
       id: null
     };
 
@@ -51,7 +51,7 @@ class CourseDetail extends Component {
       });
   };
 
-  //this makes the JSX for a course JSON
+  // This will make the JSX for a course JSON
   convertJsonToCourseContent = course => {
     return (
       <div className="bounds course--detail">
@@ -88,7 +88,7 @@ class CourseDetail extends Component {
     );
   };
 
-  //once it loads it gets the course for the ID
+  // This will get the course for the ID once it loads it
   componentDidMount() {
     this.fetchCourseById(this.props.match.params.id);
   }
@@ -128,6 +128,7 @@ class CourseDetail extends Component {
                       Update Course
                     </a>
                     <button className="button" onClick={this.deleteCourse}>
+                     
                       Delete Course
                     </button>
                   </span>
@@ -136,6 +137,7 @@ class CourseDetail extends Component {
                 <React.Fragment></React.Fragment>
               )}
               <a className="button button-secondary" href="/courses/">
+               
                 Return to List
               </a>
             </div>
@@ -146,7 +148,7 @@ class CourseDetail extends Component {
     );
   }
 
-  //the delete coure is combine with the application
+  // This delete coure is combined with the application
   deleteCourse = () => {
     const { context } = this.props;
 

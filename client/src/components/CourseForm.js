@@ -60,7 +60,7 @@ export default (props) => {
     );
 }
 
-//if validation errors exist,  it will show this formula or method
+// If validation errors exist, this method will show
 function ErrorsDisplay({ errors }) {
     let errorsDisplay = null;
 
